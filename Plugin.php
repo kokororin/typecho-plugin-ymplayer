@@ -38,6 +38,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 
     public static function deactivate()
     {
+        Helper::removeRoute('ymplayer_ajax');
         $files = glob(dirname(__FILE__) . '/cache/*');
         foreach ($files as $file)
         {
