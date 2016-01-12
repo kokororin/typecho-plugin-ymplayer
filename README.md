@@ -23,8 +23,8 @@ A typecho plugin for ymplayer https://github.com/kirainmoe/ymplayer
 
 其中：
 
-"style"的值可为honoka,kotori等或空，默认为kotori，具体请参考ymplayer的文档
-"id"的值为网易云音乐的歌曲id
+* "style"的值可为honoka,kotori等或空，默认为kotori，具体请参考ymplayer的文档  
+* "id"的值为网易云音乐的歌曲id
 
 ## LICENSE
 
