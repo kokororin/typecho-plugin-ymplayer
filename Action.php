@@ -1,6 +1,7 @@
 <?php
 class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
 {
+
     public function execute()
     {
     }
@@ -22,66 +23,94 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         }
     }
 
-    private function song()
+    protected function song()
     {
         $id = $this->request->get('id');
         if (is_null($id))
         {
             $this->throw404();
         }
-        $url   = 'http://music.163.com/api/song/detail/?id=' . $id . '&ids=%5B' . $id . '%5D';
-        $json  = $this->fetch($url);
-        $data  = json_decode($json, true);
-        $array = array();
-
-        if ($data['code'] == 200)
+        $cache = $this->get_cache($id, 'song');
+        if (!$cache)
         {
-            $array = array(
-                'title'   => $data['songs'][0]['name'],
-                'song_id' => $data['songs'][0]['id'],
-                'src'     => $data['songs'][0]['mp3Url'],
-                'cover'   => $data['songs'][0]['album']['picUrl'],
-                'artist'  => $data['songs'][0]['artists'][0]['name'],
-            );
-        }
-        else
-        {
-            $this->throw404();
-        }
-        $this->response->throwJson($array);
-    }
+            $url   = 'http://music.163.com/api/song/detail/?id=' . $id . '&ids=%5B' . $id . '%5D';
+            $json  = $this->fetch($url);
+            $data  = json_decode($json, true);
+            $array = array();
 
-    private function lyric()
-    {
-        $id  = $this->request->get('id');
-        $url = 'http://music.163.com/api/song/media?id=' . $id;
-
-        $json = $this->fetch($url);
-
-        $result = json_decode($json, true);
-        if ($result['code'] == 200)
-        {
-            if ($result['lyric'])
+            if ($data['code'] == 200)
             {
-                $this->response->throwJson(array(
-                    'status' => true,
-                    'lyric'  => $result['lyric'],
-                ));
+                $array = array(
+                    'title'   => $data['songs'][0]['name'],
+                    'song_id' => $data['songs'][0]['id'],
+                    'src'     => $data['songs'][0]['mp3Url'],
+                    'cover'   => $data['songs'][0]['album']['picUrl'],
+                    'artist'  => $data['songs'][0]['artists'][0]['name'],
+                );
+                $this->set_cache($id, 'song', json_encode($array));
+                $this->response->throwJson($array);
             }
             else
             {
-                $this->response->throwJson(array(
-                    'status' => true,
-                    'lyric'  => 'not found',
-                ));
+                $this->throw404();
             }
+        }
+        else
+        {
+            exit($cache);
+        }
+
+    }
+
+    protected function lyric()
+    {
+        $id = $this->request->get('id');
+        if (is_null($id))
+        {
+            $this->throw404();
+        }
+        $cache = $this->get_cache($id, 'lyric');
+
+        if (!$cache)
+        {
+            $url = 'http://music.163.com/api/song/media?id=' . $id;
+
+            $json = $this->fetch($url);
+
+            $result = json_decode($json, true);
+            if ($result['code'] == 200)
+            {
+                if ($result['lyric'])
+                {
+                    $array = array(
+                        'status' => true,
+                        'lyric'  => $result['lyric'],
+                    );
+                    $this->set_cache($id, 'lyric', $array['lyric']);
+                    $this->response->throwJson($array);
+                }
+                else
+                {
+                    $this->response->throwJson(array(
+                        'status' => true,
+                        'lyric'  => 'not found',
+                    ));
+                }
+            }
+        }
+        else
+        {
+            $this->response->throwJson(array(
+                'status' => true,
+                'lyric'  => $cache,
+            ));
         }
 
         $this->throw404();
 
     }
 
-    private function fetch($url)
+    protected function fetch($url)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -93,53 +122,53 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         return $result;
     }
 
-    private function throw404()
+    protected function throw404()
     {
         Typecho_Response::setStatus(404);
         $this->response->throwJson(array('status' => '404 Not Found.'));
     }
 
-    private function throw403()
+    protected function throw403()
     {
         Typecho_Response::setStatus(403);
         $this->response->throwJson(array('status' => '403 Forbidden.'));
     }
 
-    private function substr($str, $start = 0, $length, $charset = "utf-8", $suffix = true)
+    protected function get_cache($id, $type)
     {
-        if (function_exists("mb_substr"))
+        $filename = $this->get_cache_name($id, $type);
+        if (is_file($filename))
         {
-            if ($suffix && strlen($str) > $length)
-            {
-                return mb_substr($str, $start, $length, $charset) . "...";
-            }
-            else
-            {
-                return mb_substr($str, $start, $length, $charset);
-            }
+            return file_get_contents($filename);
         }
-        elseif (function_exists('iconv_substr'))
+        else
         {
-            if ($suffix && strlen($str) > $length)
-            {
-                return iconv_substr($str, $start, $length, $charset) . "...";
-            }
-            else
-            {
-                return iconv_substr($str, $start, $length, $charset);
-            }
+            return false;
         }
-        $re['utf-8']  = "/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/";
-        $re['gb2312'] = "/[\x01-\x7f]|[\xb0-\xf7][\xa0-\xfe]/";
-        $re['gbk']    = "/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/";
-        $re['big5']   = "/[\x01-\x7f]|[\x81-\xfe]([\x40-\x7e]|\xa1-\xfe])/";
-        preg_match_all($re[$charset], $str, $match);
-        $slice = join("", array_slice($match[0], $start, $length));
-        if ($suffix)
+
+    }
+
+    protected function set_cache($id, $type, $content)
+    {
+        $filename = $this->get_cache_name($id, $type);
+        file_put_contents($filename, $content);
+    }
+
+    protected function get_cache_name($id, $type)
+    {
+        $cache_dir = dirname(__FILE__) . '/cache';
+        if ($type == 'song')
         {
-            return $slice . "…";
+            return $cache_dir . '/' . $id . '.json';
         }
-        return $slice;
+        elseif ($type == 'lyric')
+        {
+            return $cache_dir . '/' . $id . '.lrc';
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }
