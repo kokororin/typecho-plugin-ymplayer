@@ -111,7 +111,7 @@ var ymplayer_params = " . json_encode(array(
                     $data['style'] = 'kotori';
                 }
                 self::$song_id = $data['id'];
-                $html          = '<ymplayer class="' . $data['style'] . '" src="{src}" name="with_lyric" loop="no" cover="{cover}" song="{song}" artist="{artist}">';
+                $html          = '<ymplayer class="' . $data['style'] . '" src="{src}" name="'.$data['id'].'" loop="no" cover="{cover}" song="{song}" artist="{artist}">';
                 $html .= '<lrc>{lrc}</lrc>';
                 $html .= '</ymplayer>';
                 return $html;
