@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.1
+ * @version 0.2
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
@@ -34,6 +34,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
         Typecho_Plugin::factory('admin/write-post.php')->bottom        = array(__CLASS__, 'button');
         Typecho_Plugin::factory('admin/write-page.php')->bottom        = array(__CLASS__, 'button');
         Helper::addRoute('ymplayer_ajax', '/ymplayer.json', 'ymplayer_Action', 'ajax');
+        return '启用成功，请根据需要设置插件_ (:з」∠) _';
     }
 
     public static function deactivate()
@@ -51,11 +52,19 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-        $font_awesome = new Typecho_Widget_Helper_Form_Element_Radio(
+        $element = new Typecho_Widget_Helper_Form_Element_Radio(
             'font_awesome', array(
                 'no'  => '不引入',
                 'yes' => '引入'), 'no', '是否引入font-awesome', '如果你使用的主题已经引入，请选否。');
-        $form->addInput($font_awesome);
+        $form->addInput($element);
+        $element = new Typecho_Widget_Helper_Form_Element_Radio(
+            'force', array(
+                'no'  => '不启用',
+                'yes' => '启用'), 'no', '是否开启强制兼容模式', '如果样式有冲突，请启用');
+        $form->addInput($element);
+        $element = new Typecho_Widget_Helper_Form_Element_Textarea(
+            'custom', null, '', '自定义样式', '请直接输入css代码，请不要带&lt;style&gt;标签');
+        $form->addInput($element);
     }
 
     public static function personalConfig(Typecho_Widget_Helper_Form $form)
@@ -66,10 +75,20 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
     {
         if (self::$flag)
         {
-            $font_awesome_option = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
-            if ($font_awesome_option == 'yes')
+            $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
+            $force        = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
+            $custom       = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
+            if ($font_awesome == 'yes')
             {
                 echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/font-awesome.css\" rel=\"stylesheet\">\n";
+            }
+            if ($force == 'yes')
+            {
+                echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/force.css\" rel=\"stylesheet\">\n";
+            }
+            if ($custom != '')
+            {
+                echo "<style id=\"ymplayer_custom_style\">\n" . $custom . "\n</style>";
             }
             echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.css\" rel=\"stylesheet\">\n";
         }
@@ -99,20 +118,20 @@ var ymplayer_params = " . json_encode(array(
             {
                 self::$flag = true;
                 $all        = $matches[2];
+                $all        = preg_replace('/^\s*$/', ' ', $all);
                 $attrs      = explode(' ', $all);
                 $data       = array();
                 foreach ($attrs as $attr)
                 {
                     $pair                 = explode('=', $attr);
-                    $data[trim($pair[0])] = trim($pair[1]);
+                    @$data[trim($pair[0])] = trim($pair[1]);
                 }
                 if (!isset($data['style']))
                 {
-                    $data['style'] = 'kotori';
+                    $data['style'] = '';
                 }
                 self::$song_id = $data['id'];
-                $html          = '<ymplayer class="' . $data['style'] . '" src="{src}" name="'.$data['id'].'" loop="no" cover="{cover}" song="{song}" artist="{artist}">';
-                $html .= '<lrc>{lrc}</lrc>';
+                $html          = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
                 $html .= '</ymplayer>';
                 return $html;
             }, $text);
