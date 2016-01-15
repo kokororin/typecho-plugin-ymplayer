@@ -65,6 +65,63 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
         $element = new Typecho_Widget_Helper_Form_Element_Textarea(
             'custom', null, '', '自定义样式', '请直接输入css代码，请不要带&lt;style&gt;标签');
         $form->addInput($element);
+        $element = new Typecho_Widget_Helper_Form_Element_Submit();
+        $element->value('检查更新');
+        $element->setAttribute('style', '');
+        $element->input->setAttribute('type', 'button');
+        $element->input->setAttribute('style', 'bottom:37px;');
+        $element->input->setAttribute('class', 'btn btn-s btn-operate ymplayer-update');
+        $element->input->setAttribute('onclick', 'ymplayer_check();');
+        $form->addItem($element);
+        $script = "<script type=\"text/javascript\">
+var ymplayer_check = function() {
+    var btn = jQuery('.ymplayer-update');
+    jQuery.ajax({
+        url: '" . Helper::options()->index . "/ymplayer.json?type=checkUpdate',
+        type: 'get',
+        beforeSend: function() {
+            btn.html('请求中哦=A=');
+            btn.attr('disabled', true).fadeTo('slow', 0.5);
+        },
+        success: function(data) {
+            if (data.status == true) {
+                btn.html(data.text);
+                btn.removeAttr('disabled').fadeTo('', 1);
+                btn.attr('onclick', 'ymplayer_download();');
+            } else {
+                btn.html(data.text);
+            }
+        },
+        error: function() {
+            btn.html('网络错误，请重试=A=');
+        }
+    });
+};
+var ymplayer_download = function() {
+    btn = jQuery('.ymplayer-update');
+    jQuery.ajax({
+        url: '" . Helper::options()->index . "/ymplayer.json?type=downloadUpdate',
+        type: 'get',
+        beforeSend: function() {
+            btn.html('请求中哦=A=');
+            btn.attr('disabled', true).fadeTo('slow', 0.5);
+        },
+        success: function() {
+            if (data == 'success') {
+                btn.html('更新成功');
+            } else {
+                btn.html('更新失败，请重试');
+            }
+        },
+        error: function() {
+            btn.html('网络错误，请重试');
+        }
+
+    });
+
+};
+</script>";
+        echo $script;
     }
 
     public static function personalConfig(Typecho_Widget_Helper_Form $form)
@@ -123,7 +180,7 @@ var ymplayer_params = " . json_encode(array(
                 $data       = array();
                 foreach ($attrs as $attr)
                 {
-                    $pair                 = explode('=', $attr);
+                    $pair                  = explode('=', $attr);
                     @$data[trim($pair[0])] = trim($pair[1]);
                 }
                 if (!isset($data['style']))

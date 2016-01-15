@@ -171,4 +171,72 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         }
     }
 
+    protected function checkUpdate()
+    {
+        $remote          = 'https://kotori.sinaapp.com/ymplayer/latest?path=Plugin.php';
+        $local           = dirname(__FILE__) . '/Plugin.php';
+        $info            = Typecho_Plugin::parseInfo($remote);
+        $latest_version  = $info['version'];
+        $info            = Typecho_Plugin::parseInfo($local);
+        $current_version = $info['version'];
+        $text            = '你的版本是' . $current_version . '，GitHub上游版本是' . $latest_version . '，';
+        if ($current_version >= $latest_version)
+        {
+            $status = false;
+            $text .= '无需更新。';
+        }
+        else
+        {
+            $status = true;
+            $text .= '再次点击按钮进行更新。';
+        }
+        $this->response->throwJson(array(
+            'status' => $status,
+            'text'   => $text,
+        ));
+    }
+
+    protected function downloadUpdate()
+    {
+        $array = array(
+            $this->download_file('Plugin.php'),
+            $this->download_file('Action.php'),
+            $this->download_file('force.css'),
+            $this->download_file('init.js'),
+            $this->download_file('dist/ymplayer.css'),
+            $this->download_file('dist/ymplayer.min.js'),
+        );
+        foreach ($array as $value)
+        {
+            if ($value == false)
+            {
+                exit('failure');
+            }
+        }
+        exit('success');
+    }
+
+    protected function download_file($path)
+    {
+        $url  = 'https://kotori.sinaapp.com/ymplayer/latest?path=' . $path;
+        $path = dirname(__FILE__) . '/' . $path;
+        try {
+            $ch = curl_init();
+            $fp = fopen($path, 'wb');
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+            return true;
+        }
+        catch (Exception $e)
+        {
+            return false;
+        }
+    }
+
 }
