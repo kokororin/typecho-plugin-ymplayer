@@ -77,7 +77,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 var ymplayer_check = function() {
     var btn = jQuery('.ymplayer-update');
     jQuery.ajax({
-        url: '" . Helper::options()->index . "/ymplayer.json?type=checkUpdate',
+        url: '" . rtrim(Helper::options()->index, '/') . "/ymplayer.json?type=checkUpdate',
         type: 'get',
         beforeSend: function() {
             btn.html('请求中哦=A=');
@@ -100,7 +100,7 @@ var ymplayer_check = function() {
 var ymplayer_download = function() {
     btn = jQuery('.ymplayer-update');
     jQuery.ajax({
-        url: '" . Helper::options()->index . "/ymplayer.json?type=downloadUpdate',
+        url: '" . rtrim(Helper::options()->index, '/') . "/ymplayer.json?type=downloadUpdate',
         type: 'get',
         beforeSend: function() {
             btn.html('请求中哦=A=');
@@ -157,7 +157,7 @@ var ymplayer_download = function() {
         {
             echo "\n<script type=\"text/javascript\">
 var ymplayer_params = " . json_encode(array(
-                'url'     => Helper::options()->index . '/ymplayer.json',
+                'url'     => rtrim(Helper::options()->index, '/') . '/ymplayer.json',
                 'song_id' => self::$song_id,
             )) . ";
 </script>";
