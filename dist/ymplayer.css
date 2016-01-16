@@ -149,9 +149,9 @@ ymplayer lrc{
 	height: 100%;
 	width: 0%;
 	background-color: rgb(206,255,255);
-	-webkit-transition:0.3s all;
-	transition:0.3s all;	
-	-moz-transition:0.3s all;	
+	-webkit-transition:0.2s all;
+	transition:0.2s all;	
+	-moz-transition:0.2s all;	
 }
 .ym-circle{
 	width: 6px;
@@ -165,6 +165,16 @@ ymplayer lrc{
 	box-sizing:content-box!important;
 	-moz-box-sizing:content-box!important;
 	-webkit-box-sizing:content-box!important;
+	transition:0.3s all;
+	-webkit-transition:0.3s all;
+	-moz-transition:0.3s all;	
+	-o-transition:0.3s all;	
+}
+.ym-circle:hover{
+    width:12px;
+    height:12px;
+    top:-6px;
+    right:-12px;
 }
 .looping{
 	color: rgb(83,209,223)!important;
