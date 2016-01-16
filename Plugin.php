@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.2
+ * @version 0.3
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
