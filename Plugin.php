@@ -18,8 +18,8 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  */
 class ymplayer_Plugin implements Typecho_Plugin_Interface
 {
-    protected static $flag = false;
-    protected static $song_id;
+    static $flag = false;
+    static $song_id;
 
     public static function activate()
     {
@@ -130,7 +130,7 @@ var ymplayer_download = function() {
 
     public static function insertStyle()
     {
-        if (self::$flag)
+        if (ymplayer_Plugin::$flag)
         {
             $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
             $force        = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
@@ -153,12 +153,12 @@ var ymplayer_download = function() {
 
     public static function insertScript()
     {
-        if (self::$flag)
+        if (ymplayer_Plugin::$flag)
         {
             echo "\n<script type=\"text/javascript\">
 var ymplayer_params = " . json_encode(array(
                 'url'     => rtrim(Helper::options()->index, '/') . '/ymplayer.json',
-                'song_id' => self::$song_id,
+                'song_id' => ymplayer_Plugin::$song_id,
             )) . ";
 </script>";
             echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.min.js\"></script>";
@@ -173,11 +173,11 @@ var ymplayer_params = " . json_encode(array(
         {
             $text = preg_replace_callback('/\[(ymplayer)](.*?)\[\/\\1]/si', function ($matches)
             {
-                self::$flag = true;
-                $all        = $matches[2];
-                $all        = preg_replace('/^\s*$/', ' ', $all);
-                $attrs      = explode(' ', $all);
-                $data       = array();
+                ymplayer_Plugin::$flag = true;
+                $all                   = $matches[2];
+                $all                   = preg_replace('/^\s*$/', ' ', $all);
+                $attrs                 = explode(' ', $all);
+                $data                  = array();
                 foreach ($attrs as $attr)
                 {
                     $pair                  = explode('=', $attr);
@@ -187,8 +187,8 @@ var ymplayer_params = " . json_encode(array(
                 {
                     $data['style'] = '';
                 }
-                self::$song_id = $data['id'];
-                $html          = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
+                ymplayer_Plugin::$song_id = $data['id'];
+                $html                     = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
                 $html .= '</ymplayer>';
                 return $html;
             }, $text);
