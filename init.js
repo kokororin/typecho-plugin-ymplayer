@@ -1,6 +1,7 @@
 (function() {
-
-    var ymplayer = document.getElementsByTagName("ymplayer")[0];
+    var ymplayers = document.getElementsByTagName("ymplayer");
+    if (ymplayers.length == 0) return;
+    var ymplayer = ymplayers[0];
     var id = ymplayer.attributes.name.value;
 
     request({
