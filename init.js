@@ -1,16 +1,17 @@
 (function() {
 
     var ymplayer = document.getElementsByTagName("ymplayer")[0];
+    var id = ymplayer.attributes.name.value;
 
     request({
-        url: ymplayer_params.url + '?type=song&id=' + ymplayer_params.song_id,
+        url: ymplayer_params.url + '?type=song&id=' + id,
         success: function(data) {
             ymplayer.attributes.src.value = data.src;
             ymplayer.attributes.cover.value = data.cover;
             ymplayer.attributes.song.value = data.title;
             ymplayer.attributes.artist.value = data.artist;
             request({
-                url: ymplayer_params.url + '?type=lyric&id=' + ymplayer_params.song_id,
+                url: ymplayer_params.url + '?type=lyric&id=' + id,
                 success: function(data) {
                     if (data.lyric != 'not found') {
                         var lrc = document.createElement('lrc');
