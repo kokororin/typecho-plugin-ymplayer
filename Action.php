@@ -23,6 +23,34 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         }
     }
 
+    protected function playlist()
+    {
+        $playlist = $this->request->get('playlist');
+
+        if (is_null($playlist))
+            $this->throw404();
+        $url   = 'http://music.163.com/api/playlist/detail/?id=' . $playlist;
+        $json  = $this->fetch($url);
+        $data  = json_decode($json, true);
+        $res = $data['result']['tracks'];
+
+        $dom = "";
+
+        for ($c = 0; $c < count($res); $c++)
+        {
+            $src = $res[$c]['mp3Url'];
+            $name = $res[$c]['name'];
+            $artist = $res[$c]['artists'][0]['name'];
+            $cover = $res[$c]['album']['picUrl'];
+            $id = $res[$c]['id'];
+            $url = 'http://music.163.com/api/song/media?id=' . $id;
+            $lrc = json_decode($this->fetch($url),true);
+            ($lrc['code'] == 200 && isset($lrc['lyric'])) ? $lrc = $lrc['lyric'] : $lrc = "";
+            $dom .= "<song src=\"{$src}\" song=\"{$name}\" artist=\"{$artist}\" cover=\"{$cover}\" mid=\"{$id}\">{$lrc}</song>\n";
+        }
+        echo $dom;
+    }
+
     protected function song()
     {
         $id = $this->request->get('id');
