@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.3
+ * @version 0.4
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
@@ -163,21 +163,26 @@ var ymplayer_params = " . json_encode(array(
         {
             $text = preg_replace_callback('/\[(ymplayer)](.*?)\[\/\\1]/si', function ($matches)
             {
-                $all   = $matches[2];
-                $all   = preg_replace('/^\s*$/', ' ', $all);
-                $attrs = explode(' ', $all);
+                $field   = $matches[2];
+                $field   = preg_replace('/^\s*$/', ' ', $field);
+                $attrs = explode(' ', $field);
                 $data  = array();
                 foreach ($attrs as $attr)
                 {
                     $pair                  = explode('=', $attr);
                     @$data[trim($pair[0])] = trim($pair[1]);
                 }
+                if (!isset($data['id']) || $data['id'] == '')
+                {
+                    return;
+                }
                 if (!isset($data['style']))
                 {
                     $data['style'] = '';
                 }
 
-                $html = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
+                $html = '<ymplayer style="display:none;" class="' . $data['style'] . ' "name="with_lyric" loop="no" field="[' . $data['id'] . ']">';
+
                 $html .= '</ymplayer>';
                 return $html;
             }, $text);
