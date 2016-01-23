@@ -27,10 +27,16 @@ A typecho plugin for ymplayer https://github.com/kirainmoe/ymplayer
 [ymplayer]style=kotori id=123456,234567[/ymplayer]
 ```
 
+可以直接取网易云音乐的整个歌单：
+```
+[ymplayer]playlist=54532517[/ymplayer]
+```
+
 其中：
 
 * "style"的值可为honoka,kotori等或不填
 * "id"的值为网易云音乐的歌曲id
+* "playlist"的值为网易云音乐的歌单id，和"id"只能二选一
 
 ## LICENSE
 
