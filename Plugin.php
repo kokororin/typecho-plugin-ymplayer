@@ -174,14 +174,23 @@ var ymplayer_params = " . json_encode(array(
                 }
                 if (!isset($data['id']) || $data['id'] == '')
                 {
-                    return;
+                   if(isset($data['playlist']) && "" != $data['playlist'])
+                   {
+                   	   $data['id'] = "{list:".$data['playlist']."}";
+                   }
+                   else
+                      return;
+                }
+                else
+                {
+                	$data['id'] = "[".$data['id']."]";
                 }
                 if (!isset($data['style']))
                 {
                     $data['style'] = '';
                 }
 
-                $html = '<ymplayer style="display:none;" class="' . $data['style'] . ' "name="with_lyric" loop="no" field="[' . $data['id'] . ']">';
+                $html = '<ymplayer style="display:none;" class="' . $data['style'] . ' "name="with_lyric" loop="no" field="' . $data['id'] . '">';
 
                 $html .= '</ymplayer>';
                 return $html;
