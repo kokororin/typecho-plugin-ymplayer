@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.2
+ * @version 0.3
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
@@ -18,9 +18,6 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  */
 class ymplayer_Plugin implements Typecho_Plugin_Interface
 {
-    protected static $flag = false;
-    protected static $song_id;
-
     public static function activate()
     {
         if (substr(trim(dirname(__FILE__), '/'), -8) != 'ymplayer')
@@ -77,7 +74,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 var ymplayer_check = function() {
     var btn = jQuery('.ymplayer-update');
     jQuery.ajax({
-        url: '" . Helper::options()->index . "/ymplayer.json?type=checkUpdate',
+        url: '" . rtrim(Helper::options()->index, '/') . "/ymplayer.json?type=checkUpdate',
         type: 'get',
         beforeSend: function() {
             btn.html('请求中哦=A=');
@@ -100,7 +97,7 @@ var ymplayer_check = function() {
 var ymplayer_download = function() {
     btn = jQuery('.ymplayer-update');
     jQuery.ajax({
-        url: '" . Helper::options()->index . "/ymplayer.json?type=downloadUpdate',
+        url: '" . rtrim(Helper::options()->index, '/') . "/ymplayer.json?type=downloadUpdate',
         type: 'get',
         beforeSend: function() {
             btn.html('请求中哦=A=');
@@ -130,40 +127,33 @@ var ymplayer_download = function() {
 
     public static function insertStyle()
     {
-        if (self::$flag)
+        $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
+        $force        = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
+        $custom       = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
+        if ($font_awesome == 'yes')
         {
-            $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
-            $force        = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
-            $custom       = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
-            if ($font_awesome == 'yes')
-            {
-                echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/font-awesome.css\" rel=\"stylesheet\">\n";
-            }
-            if ($force == 'yes')
-            {
-                echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/force.css\" rel=\"stylesheet\">\n";
-            }
-            if ($custom != '')
-            {
-                echo "<style id=\"ymplayer_custom_style\">\n" . $custom . "\n</style>";
-            }
-            echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.css\" rel=\"stylesheet\">\n";
+            echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/font-awesome.css\" rel=\"stylesheet\">\n";
         }
+        if ($force == 'yes')
+        {
+            echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/force.css\" rel=\"stylesheet\">\n";
+        }
+        if ($custom != '')
+        {
+            echo "<style id=\"ymplayer_custom_style\">\n" . $custom . "\n</style>";
+        }
+        echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.css\" rel=\"stylesheet\">\n";
     }
 
     public static function insertScript()
     {
-        if (self::$flag)
-        {
-            echo "\n<script type=\"text/javascript\">
+        echo "\n<script type=\"text/javascript\">
 var ymplayer_params = " . json_encode(array(
-                'url'     => Helper::options()->index . '/ymplayer.json',
-                'song_id' => self::$song_id,
-            )) . ";
+            'url' => rtrim(Helper::options()->index, '/') . '/ymplayer.json',
+        )) . ";
 </script>";
-            echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.min.js\"></script>";
-            echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/init.js\"></script>";
-        }
+        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.min.js\"></script>";
+        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/init.js\"></script>";
     }
 
     public static function parse($text, $widget, $lastResult)
@@ -173,11 +163,10 @@ var ymplayer_params = " . json_encode(array(
         {
             $text = preg_replace_callback('/\[(ymplayer)](.*?)\[\/\\1]/si', function ($matches)
             {
-                self::$flag = true;
-                $all        = $matches[2];
-                $all        = preg_replace('/^\s*$/', ' ', $all);
-                $attrs      = explode(' ', $all);
-                $data       = array();
+                $all   = $matches[2];
+                $all   = preg_replace('/^\s*$/', ' ', $all);
+                $attrs = explode(' ', $all);
+                $data  = array();
                 foreach ($attrs as $attr)
                 {
                     $pair                  = explode('=', $attr);
@@ -187,8 +176,8 @@ var ymplayer_params = " . json_encode(array(
                 {
                     $data['style'] = '';
                 }
-                self::$song_id = $data['id'];
-                $html          = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
+
+                $html = '<ymplayer class="' . $data['style'] . '" src="" name="' . $data['id'] . '" loop="no" cover="" song="" artist="">';
                 $html .= '</ymplayer>';
                 return $html;
             }, $text);
