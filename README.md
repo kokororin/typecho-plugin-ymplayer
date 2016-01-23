@@ -17,8 +17,14 @@ A typecho plugin for ymplayer https://github.com/kirainmoe/ymplayer
 
 在文章编辑页面中，在要插入播放器的部分点击YM工具栏按钮或输入以下代码：
 
+一首歌
 ```
 [ymplayer]style=kotori id=123456[/ymplayer]
+```
+
+多首歌(使用英文逗号分隔)
+```
+[ymplayer]style=kotori id=123456,234567[/ymplayer]
 ```
 
 其中：
