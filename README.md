@@ -11,7 +11,7 @@ A typecho plugin for ymplayer https://github.com/kirainmoe/ymplayer
 ### 常规方法
 Download ZIP, 解压，将插件目录命名为ymplayer在后台启用即可
 ### 使用git安装
-```
+```bash
 #安装插件
 $ cd /path/to/your/typecho/plugin/
 $ git clone https://github.com/kokororin/typecho-plugin-ymplayer ymplayer
