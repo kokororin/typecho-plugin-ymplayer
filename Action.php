@@ -25,30 +25,37 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
 
     protected function playlist()
     {
-        $playlist = $this->request->get('playlist');
+        $id = $this->request->get('id');
 
-        if (is_null($playlist))
+        if (is_null($id))
+        {
             $this->throw404();
-        $url   = 'http://music.163.com/api/playlist/detail/?id=' . $playlist;
+        }
+
+        $url   = 'http://music.163.com/api/playlist/detail/?id=' . $id;
         $json  = $this->fetch($url);
         $data  = json_decode($json, true);
-        $res = $data['result']['tracks'];
-
-        $dom = "";
-
-        for ($c = 0; $c < count($res); $c++)
+        $array = array();
+        if ($data['code'] == 200)
         {
-            $src = $res[$c]['mp3Url'];
-            $name = $res[$c]['name'];
-            $artist = $res[$c]['artists'][0]['name'];
-            $cover = $res[$c]['album']['picUrl'];
-            $id = $res[$c]['id'];
-            $url = 'http://music.163.com/api/song/media?id=' . $id;
-            $lrc = json_decode($this->fetch($url),true);
-            ($lrc['code'] == 200 && isset($lrc['lyric'])) ? $lrc = $lrc['lyric'] : $lrc = "";
-            $dom .= "<song src=\"{$src}\" song=\"{$name}\" artist=\"{$artist}\" cover=\"{$cover}\" mid=\"{$id}\">{$lrc}</song>\n";
+            foreach ($data['result']['tracks'] as $value)
+            {
+                $array[] = array(
+                    'title'    => $value['name'],
+                    'song_id'  => $value['id'],
+                    'src'      => $value['mp3Url'],
+                    'album_id' => $value['album']['id'],
+                    'cover'    => $value['album']['picUrl'],
+                    'artist'   => $value['artists'][0]['name'],
+                );
+            }
         }
-        echo $dom;
+        else
+        {
+            $this->throw404();
+        }
+        $this->response->throwJson($array);
+
     }
 
     protected function song()

@@ -19,12 +19,12 @@ A typecho plugin for ymplayer https://github.com/kirainmoe/ymplayer
 
 一首歌
 ```
-[ymplayer]style=kotori id=123456[/ymplayer]
+[ymplayer]style=kotori id=26214328[/ymplayer]
 ```
 
 多首歌(使用英文逗号分隔)
 ```
-[ymplayer]style=kotori id=123456,234567[/ymplayer]
+[ymplayer]id=26214328,631555,26214326[/ymplayer]
 ```
 
 可以直接取网易云音乐的整个歌单：

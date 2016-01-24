@@ -7,27 +7,17 @@ var typechoYmplayer = {
         if (ymplayerCount.length == 0) return;
 
         for (var i = 0; i < ymplayerCount; i++) {
+            console.log(i);
             var ymplayer = ymplayerAll[i];
             var field = ymplayer.attributes.field.value;
             var idAll = that.toJSON(field);
-            that.idAllCount[i] = idAll.length;
             if (typeof idAll['list'] == 'undefined' || typeof idAll['list'] == 'null') {
+                that.idAllCount[i] = idAll.length;
                 for (var u = 0, v = idAll.length; u < v; u++) {
                     that.request({
                         url: ymplayer_params.url + '?type=song&id=' + idAll[u],
                         success: function(data) {
-                            var song = that.createSong(data);
-
-                            that.request({
-                                url: ymplayer_params.url + '?type=lyric&id=' + song.attributes.songid.value,
-                                success: function(data) {
-                                    if (data.lyric != 'not found') {
-                                        song.innerHTML = data.lyric;
-                                        ymplayer.appendChild(song);
-                                    }
-                                }
-                            });
-
+                            that.createSong(data, ymplayer);
                         },
                         error: function() {
                             that.remove(ymplayer);
@@ -37,10 +27,13 @@ var typechoYmplayer = {
                 }
             } else {
                 console.log("233");
-                request({
-                    url: ymplayer_params.url + '?type=playlist&playlist=' + idAll['list'],
+                that.request({
+                    url: ymplayer_params.url + '?type=playlist&id=' + idAll['list'],
                     success: function(data) {
-                        ymplayer.innerHTML = data;
+                        that.idAllCount[i-1] = data.length;
+                        for (var j = 0, playlistCount = data.length; j < playlistCount; j++) {
+                            that.createSong(data[j], ymplayer);
+                        }
                     },
                     error: function() {
                         that.remove(ymplayer);
@@ -50,9 +43,11 @@ var typechoYmplayer = {
 
         }
         var timer = setInterval(function() {
-            for (var i = 0; i < ymplayerCount; i++) {
-                if (ymplayer.getElementsByTagName('song').length == that.idAllCount[i]) {
-                    ymplayerAll[i].style.display = '';
+            console.log(that.idAllCount);
+            for (var k = 0; k < ymplayerCount; k++) {
+                console.log(that.idAllCount[i]);
+                if (ymplayer.getElementsByTagName('song').length == that.idAllCount[k]) {
+                    ymplayerAll[k].style.display = '';
                 } else {
                     return;
                 }
@@ -62,7 +57,8 @@ var typechoYmplayer = {
         }, 1000);
 
     },
-    createSong: function(data) {
+    createSong: function(data, element) {
+        var that = this;
         var song = document.createElement('song');
         song.attributes.setNamedItem(document.createAttribute('src'));
         song.attributes.setNamedItem(document.createAttribute('song'));
@@ -74,7 +70,19 @@ var typechoYmplayer = {
         song.attributes.artist.value = data.artist;
         song.attributes.cover.value = data.cover;
         song.attributes.songid.value = data.song_id;
-        return song;
+        //console.log(song);
+        that.request({
+            url: ymplayer_params.url + '?type=lyric&id=' + data.song_id,
+            success: function(data) {
+                if (data.lyric != 'not found') {
+                    song.innerHTML = data.lyric;
+                    element.appendChild(song);
+                }
+            },
+            error: function() {
+                song.innerHTML = '';
+            }
+        });
     },
     remove: function(element) {
         element.parentNode.removeChild(element);
@@ -86,11 +94,7 @@ var typechoYmplayer = {
         var xmlhttp = new XMLHttpRequest() || new ActiveXObject('Microsoft.XMLHTTP');
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200 && !!o.success) {
-                if (xmlhttp.responseText.match("^\{(.+:.+,*){1,}\}$")) {
-                    o.success(that.toJSON(xmlhttp.responseText));
-                } else {
-                    o.success(xmlhttp.responseText);
-                }
+                o.success(that.toJSON(xmlhttp.responseText));
             }
 
             if (xmlhttp.readyState == 4 && xmlhttp.status != 200 && !!o.error)
@@ -102,7 +106,11 @@ var typechoYmplayer = {
         xmlhttp.send(null);
     },
     toJSON: function(str) {
-        return eval("(" + str + ")");
+        try {
+            return eval("(" + str + ")");
+        } catch (e) {
+            return str;
+        }
     }
 };
 
