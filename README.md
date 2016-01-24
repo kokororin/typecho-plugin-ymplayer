@@ -15,9 +15,10 @@ Download ZIP, 解压，将插件目录命名为ymplayer在后台启用即可
 #安装插件
 $ cd /path/to/your/typecho/plugin/
 $ git clone https://github.com/kokororin/typecho-plugin-ymplayer ymplayer
+$ cd ymplayer
 $ chown -R www:www * 
 #更新插件 
-$ cd /path/to/your/typecho/plugin/
+$ cd /path/to/your/typecho/plugin/ymplayer
 $ git pull
 $ chown -R www:www *
 ```
