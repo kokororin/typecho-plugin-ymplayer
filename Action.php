@@ -26,35 +26,42 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
     protected function playlist()
     {
         $id = $this->request->get('id');
-
         if (is_null($id))
         {
             $this->throw404();
         }
-
-        $url   = 'http://music.163.com/api/playlist/detail/?id=' . $id;
-        $json  = $this->fetch($url);
-        $data  = json_decode($json, true);
-        $array = array();
-        if ($data['code'] == 200)
+        $cache = $this->get_cache($id, 'playlist');
+        if (!$cache)
         {
-            foreach ($data['result']['tracks'] as $value)
+            $url   = 'http://music.163.com/api/playlist/detail/?id=' . $id;
+            $json  = $this->fetch($url);
+            $data  = json_decode($json, true);
+            $array = array();
+            if ($data['code'] == 200)
             {
-                $array[] = array(
-                    'title'    => $value['name'],
-                    'song_id'  => $value['id'],
-                    'src'      => $value['mp3Url'],
-                    'album_id' => $value['album']['id'],
-                    'cover'    => $value['album']['picUrl'],
-                    'artist'   => $value['artists'][0]['name'],
-                );
+                foreach ($data['result']['tracks'] as $value)
+                {
+                    $array[] = array(
+                        'title'    => $value['name'],
+                        'song_id'  => $value['id'],
+                        'src'      => $value['mp3Url'],
+                        'album_id' => $value['album']['id'],
+                        'cover'    => $value['album']['picUrl'],
+                        'artist'   => $value['artists'][0]['name'],
+                    );
+                }
+                $this->set_cache($id, 'playlist', json_encode($array));
+                $this->response->throwJson($array);
+            }
+            else
+            {
+                $this->throw404();
             }
         }
         else
         {
-            $this->throw404();
+            exit($cache);
         }
-        $this->response->throwJson($array);
 
     }
 
@@ -200,6 +207,10 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         {
             return $cache_dir . '/' . $id . '.lrc';
         }
+        elseif ($type == 'playlist')
+        {
+            return $cache_dir . '/' . $id . '.playlist.json';
+        }
         else
         {
             return false;
@@ -234,12 +245,12 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
     protected function downloadUpdate()
     {
         $array = array(
-            $this->download_file('Plugin.php'),
-            $this->download_file('Action.php'),
-            $this->download_file('force.css'),
-            $this->download_file('init.js'),
-            $this->download_file('dist/ymplayer.css'),
-            $this->download_file('dist/ymplayer.min.js'),
+            $this->downloadFile('Plugin.php'),
+            $this->downloadFile('Action.php'),
+            $this->downloadFile('force.css'),
+            $this->downloadFile('init.js'),
+            $this->downloadFile('dist/ymplayer.css'),
+            $this->downloadFile('dist/ymplayer.min.js'),
         );
         foreach ($array as $value)
         {
@@ -251,7 +262,7 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         exit('success');
     }
 
-    protected function download_file($path)
+    protected function downloadFile($path)
     {
         $url  = 'https://kotori.sinaapp.com/ymplayer/latest?path=' . $path;
         $path = dirname(__FILE__) . '/' . $path;

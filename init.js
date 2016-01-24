@@ -30,7 +30,7 @@ var typechoYmplayer = {
                 that.request({
                     url: ymplayer_params.url + '?type=playlist&id=' + idAll['list'],
                     success: function(data) {
-                        that.idAllCount[i-1] = data.length;
+                        that.idAllCount[i - 1] = data.length;
                         for (var j = 0, playlistCount = data.length; j < playlistCount; j++) {
                             that.createSong(data[j], ymplayer);
                         }
