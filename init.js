@@ -1,40 +1,39 @@
 var typechoYmplayer = {
-    idAllCount: [],
-    finish: 0,
-    count: 0,
-    init: function() {
+    ymplayerCount: 0,
+    ymplayerAll: null,
+    domInit: function() {
         var that = this;
-        var ymplayerAll = document.getElementsByTagName("ymplayer");
-        var ymplayerCount = ymplayerAll.length;
-        if (ymplayerCount.length == 0) return;
+        that.ymplayerAll = document.getElementsByTagName("ymplayer");
+        that.ymplayerCount = that.ymplayerAll.length;
+        if (that.ymplayerCount.length == 0) return;
 
-        for (var i = 0; i < ymplayerCount; i++) {
-            console.log(i);
-            var ymplayer = ymplayerAll[i];
+        for (var i = 0; i < that.ymplayerCount; i++) {
+            var ymplayer = that.ymplayerAll[i];
             var field = ymplayer.attributes.field.value;
             var idAll = that.toJSON(field);
             if (typeof idAll['list'] == 'undefined' || typeof idAll['list'] == 'null') {
-                that.idAllCount[i] = idAll.length;
                 for (var u = 0, v = idAll.length; u < v; u++) {
                     that.request({
                         url: ymplayer_params.url + '?type=song&id=' + idAll[u],
                         success: function(data) {
                             that.createSong(data, ymplayer);
+                            that.playerInit();
                         },
                         error: function() {
                             that.remove(ymplayer);
                         }
-
                     });
+
                 }
             } else {
-                console.log("233");
                 that.request({
                     url: ymplayer_params.url + '?type=playlist&id=' + idAll['list'],
                     success: function(data) {
-                        that.idAllCount[i - 1] = data.length;
                         for (var j = 0, playlistCount = data.length; j < playlistCount; j++) {
                             that.createSong(data[j], ymplayer);
+                            if (j == (playlistCount - 1)) {
+                                that.playerInit();
+                            }
                         }
                     },
                     error: function() {
@@ -42,22 +41,9 @@ var typechoYmplayer = {
                     }
                 });
             }
-
         }
-        var timer = setInterval(function() {
-            for (var k = 0; k < ymplayerCount; k++) {
-                console.log(that.idAllCount[i]);
-                if (ymplayer.getElementsByTagName('song').length == that.idAllCount[k]) {
-                    ymplayerAll[k].style.display = '';
-                } else {
-                    return;
-                }
-            }
-            setTimeout(function() {
-                Ymplayer.Init();
-            }, 2000);
-            clearInterval(timer);
-        }, 1500);
+
+
 
     },
     createSong: function(data, element) {
@@ -73,7 +59,6 @@ var typechoYmplayer = {
         song.attributes.artist.value = data.artist;
         song.attributes.cover.value = data.cover;
         song.attributes.songid.value = data.song_id;
-        //console.log(song);
         that.request({
             url: ymplayer_params.url + '?type=lyric&id=' + data.song_id,
             success: function(data) {
@@ -86,6 +71,15 @@ var typechoYmplayer = {
                 song.innerHTML = '';
             }
         });
+    },
+    playerInit: function() {
+        var that = this;
+        setTimeout(function() {
+            for (var k = 0; k < that.ymplayerCount; k++) {
+                that.ymplayerAll[k].style.display = '';
+            }
+            Ymplayer.Init();
+        }, 500);
     },
     remove: function(element) {
         element.parentNode.removeChild(element);
@@ -118,5 +112,5 @@ var typechoYmplayer = {
 };
 
 !(function() {
-    typechoYmplayer.init();
+    typechoYmplayer.domInit();
 })();

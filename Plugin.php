@@ -26,10 +26,10 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
         }
         Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array(__CLASS__, 'parse');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx = array(__CLASS__, 'parse');
-        Typecho_Plugin::factory('Widget_Archive')->header              = array(__CLASS__, 'insertStyle');
-        Typecho_Plugin::factory('Widget_Archive')->footer              = array(__CLASS__, 'insertScript');
-        Typecho_Plugin::factory('admin/write-post.php')->bottom        = array(__CLASS__, 'button');
-        Typecho_Plugin::factory('admin/write-page.php')->bottom        = array(__CLASS__, 'button');
+        Typecho_Plugin::factory('Widget_Archive')->header = array(__CLASS__, 'insertStyle');
+        Typecho_Plugin::factory('Widget_Archive')->footer = array(__CLASS__, 'insertScript');
+        Typecho_Plugin::factory('admin/write-post.php')->bottom = array(__CLASS__, 'button');
+        Typecho_Plugin::factory('admin/write-page.php')->bottom = array(__CLASS__, 'button');
         Helper::addRoute('ymplayer_ajax', '/ymplayer.json', 'ymplayer_Action', 'ajax');
         return '启用成功，请根据需要设置插件_ (:з」∠) _';
     }
@@ -51,12 +51,12 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
     {
         $element = new Typecho_Widget_Helper_Form_Element_Radio(
             'font_awesome', array(
-                'no'  => '不引入',
+                'no' => '不引入',
                 'yes' => '引入'), 'no', '是否引入font-awesome', '如果你使用的主题已经引入，请选否。');
         $form->addInput($element);
         $element = new Typecho_Widget_Helper_Form_Element_Radio(
             'force', array(
-                'no'  => '不启用',
+                'no' => '不启用',
                 'yes' => '启用'), 'no', '是否开启强制兼容模式', '如果样式有冲突，请启用');
         $form->addInput($element);
         $element = new Typecho_Widget_Helper_Form_Element_Textarea(
@@ -128,8 +128,8 @@ var ymplayer_download = function() {
     public static function insertStyle()
     {
         $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
-        $force        = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
-        $custom       = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
+        $force = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
+        $custom = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
         if ($font_awesome == 'yes')
         {
             echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/font-awesome.css\" rel=\"stylesheet\">\n";
@@ -166,10 +166,10 @@ var ymplayer_params = " . json_encode(array(
                 $field = $matches[2];
                 $field = preg_replace('/^\s*$/', ' ', $field);
                 $attrs = explode(' ', $field);
-                $data  = array();
+                $data = array();
                 foreach ($attrs as $attr)
                 {
-                    $pair                  = explode('=', $attr);
+                    $pair = explode('=', $attr);
                     @$data[trim($pair[0])] = trim($pair[1]);
                 }
                 if (!isset($data['id']) || $data['id'] == '')
