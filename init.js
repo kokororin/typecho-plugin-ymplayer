@@ -1,5 +1,7 @@
 var typechoYmplayer = {
     idAllCount: [],
+    finish: 0,
+    count: 0,
     init: function() {
         var that = this;
         var ymplayerAll = document.getElementsByTagName("ymplayer");
@@ -43,7 +45,6 @@ var typechoYmplayer = {
 
         }
         var timer = setInterval(function() {
-            console.log(that.idAllCount);
             for (var k = 0; k < ymplayerCount; k++) {
                 console.log(that.idAllCount[i]);
                 if (ymplayer.getElementsByTagName('song').length == that.idAllCount[k]) {
@@ -52,9 +53,11 @@ var typechoYmplayer = {
                     return;
                 }
             }
-            YmplayerIniter();
+            setTimeout(function() {
+                Ymplayer.Init();
+            }, 2000);
             clearInterval(timer);
-        }, 1000);
+        }, 1500);
 
     },
     createSong: function(data, element) {
