@@ -1,4 +1,9 @@
 <?php
+if (!defined('__TYPECHO_ROOT_DIR__'))
+{
+    exit;
+}
+
 class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
 {
 
@@ -12,6 +17,16 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
 
     public function ajax()
     {
+        $siteUrl = rtrim(Helper::options()->siteUrl, '/');
+        header('Access-Control-Allow-Origin: ' . $siteUrl);
+        header('Access-Control-Allow-Headers: Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With');
+        header('Access-Control-Allow-Methods: GET');
+
+        if (strpos($this->request->getReferer(), Helper::options()->siteUrl) === false)
+        {
+            $this->throw403();
+        }
+
         $type = $this->request->get('type');
         if (method_exists($this, $type))
         {
@@ -21,6 +36,48 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         {
             $this->throw404();
         }
+    }
+
+    protected function playlist()
+    {
+        $id = $this->request->get('id');
+        if (is_null($id))
+        {
+            $this->throw404();
+        }
+        $cache = $this->get_cache($id, 'playlist');
+        if (!$cache)
+        {
+            $url = 'http://music.163.com/api/playlist/detail/?id=' . $id;
+            $json = $this->fetch($url);
+            $data = json_decode($json, true);
+            $array = array();
+            if ($data['code'] == 200)
+            {
+                foreach ($data['result']['tracks'] as $value)
+                {
+                    $array[] = array(
+                        'title' => $value['name'],
+                        'song_id' => $value['id'],
+                        'src' => $value['mp3Url'],
+                        'album_id' => $value['album']['id'],
+                        'cover' => $value['album']['picUrl'],
+                        'artist' => $value['artists'][0]['name'],
+                    );
+                }
+                $this->set_cache($id, 'playlist', json_encode($array));
+                $this->response->throwJson($array);
+            }
+            else
+            {
+                $this->throw404();
+            }
+        }
+        else
+        {
+            exit($cache);
+        }
+
     }
 
     protected function song()
@@ -33,19 +90,19 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         $cache = $this->get_cache($id, 'song');
         if (!$cache)
         {
-            $url   = 'http://music.163.com/api/song/detail/?id=' . $id . '&ids=%5B' . $id . '%5D';
-            $json  = $this->fetch($url);
-            $data  = json_decode($json, true);
+            $url = 'http://music.163.com/api/song/detail/?id=' . $id . '&ids=%5B' . $id . '%5D';
+            $json = $this->fetch($url);
+            $data = json_decode($json, true);
             $array = array();
 
             if ($data['code'] == 200)
             {
                 $array = array(
-                    'title'   => $data['songs'][0]['name'],
+                    'title' => $data['songs'][0]['name'],
                     'song_id' => $data['songs'][0]['id'],
-                    'src'     => $data['songs'][0]['mp3Url'],
-                    'cover'   => $data['songs'][0]['album']['picUrl'],
-                    'artist'  => $data['songs'][0]['artists'][0]['name'],
+                    'src' => $data['songs'][0]['mp3Url'],
+                    'cover' => $data['songs'][0]['album']['picUrl'],
+                    'artist' => $data['songs'][0]['artists'][0]['name'],
                 );
                 $this->set_cache($id, 'song', json_encode($array));
                 $this->response->throwJson($array);
@@ -84,7 +141,7 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
                 {
                     $array = array(
                         'status' => true,
-                        'lyric'  => $result['lyric'],
+                        'lyric' => $result['lyric'],
                     );
                     $this->set_cache($id, 'lyric', $array['lyric']);
                     $this->response->throwJson($array);
@@ -93,7 +150,7 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
                 {
                     $this->response->throwJson(array(
                         'status' => true,
-                        'lyric'  => 'not found',
+                        'lyric' => 'not found',
                     ));
                 }
             }
@@ -102,7 +159,7 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         {
             $this->response->throwJson(array(
                 'status' => true,
-                'lyric'  => $cache,
+                'lyric' => $cache,
             ));
         }
 
@@ -165,6 +222,10 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         {
             return $cache_dir . '/' . $id . '.lrc';
         }
+        elseif ($type == 'playlist')
+        {
+            return $cache_dir . '/' . $id . '.playlist.json';
+        }
         else
         {
             return false;
@@ -173,13 +234,13 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
 
     protected function checkUpdate()
     {
-        $remote          = 'https://kotori.sinaapp.com/ymplayer/latest?path=Plugin.php';
-        $local           = dirname(__FILE__) . '/Plugin.php';
-        $info            = Typecho_Plugin::parseInfo($remote);
-        $latest_version  = $info['version'];
-        $info            = Typecho_Plugin::parseInfo($local);
+        $remote = 'https://kotori.sinaapp.com/ymplayer/latest?path=Plugin.php';
+        $local = dirname(__FILE__) . '/Plugin.php';
+        $info = Typecho_Plugin::parseInfo($remote);
+        $latest_version = $info['version'];
+        $info = Typecho_Plugin::parseInfo($local);
         $current_version = $info['version'];
-        $text            = '你的版本是' . $current_version . '，GitHub上游版本是' . $latest_version . '，';
+        $text = '你的版本是' . $current_version . '，GitHub上游版本是' . $latest_version . '，';
         if ($current_version >= $latest_version)
         {
             $status = false;
@@ -192,19 +253,19 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         }
         $this->response->throwJson(array(
             'status' => $status,
-            'text'   => $text,
+            'text' => $text,
         ));
     }
 
     protected function downloadUpdate()
     {
         $array = array(
-            $this->download_file('Plugin.php'),
-            $this->download_file('Action.php'),
-            $this->download_file('force.css'),
-            $this->download_file('init.js'),
-            $this->download_file('dist/ymplayer.css'),
-            $this->download_file('dist/ymplayer.min.js'),
+            $this->downloadFile('Plugin.php'),
+            $this->downloadFile('Action.php'),
+            $this->downloadFile('force.css'),
+            $this->downloadFile('init.js'),
+            $this->downloadFile('dist/ymplayer.css'),
+            $this->downloadFile('dist/ymplayer.min.js'),
         );
         foreach ($array as $value)
         {
@@ -216,9 +277,9 @@ class ymplayer_Action extends Typecho_Widget implements Widget_Interface_Do
         exit('success');
     }
 
-    protected function download_file($path)
+    protected function downloadFile($path)
     {
-        $url  = 'https://kotori.sinaapp.com/ymplayer/latest?path=' . $path;
+        $url = 'https://kotori.sinaapp.com/ymplayer/latest?path=' . $path;
         $path = dirname(__FILE__) . '/' . $path;
         try {
             $ch = curl_init();
