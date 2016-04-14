@@ -4,7 +4,6 @@ ymplayer{
 	margin:10px auto;
 	width: 100%;
 	position: relative;
-	height:120px;
 	font-family: "Microsoft Yahei";
 	color: #fff;
 	margin: 10px auto;
@@ -12,6 +11,8 @@ ymplayer{
 	-webkit-transition:0.3s all;
 	transition:0.3s all;	
 	-moz-transition:0.3s all;		
+	font-size: 14px;
+	line-height: 1.42857143;
 }
 
 ymplayer a{
@@ -36,63 +37,107 @@ ymplayer loading{
 	z-index: 233;
 	background: #000;
 }
+ymplayer[loop="yes"] .loop-button{
+	opacity: 0.3;
+}
+ymplayer .play-button .btn-play{
+	display:inline;
+}
+ymplayer .play-button .btn-pause{
+	display:none;
+}
+ymplayer[playing] .play-button .btn-play{
+	display:none;
+}
+ymplayer[playing] .play-button .btn-pause{
+	display:inline;
+}
+ymplayer[current-lrc] .no-lrc{
+	display:none;
+}
 
 .ym-controller{
-	display: inline-block;
+	overflow:visible;
+	white-space:nowrap;
+	float:right;
+	width: 60%;
+	height: 50px;
+	line-height: 50px;
+	text-align: right;
 	transition: color .25s ease, background-color .25s ease, opacity .5s ease;
-	float: right;
-	position: absolute;
-	right: 2%;
-	top:50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);	
-	width: 50%;
-
+	vertical-align: middle;
 }
+.ym-controller svg {
+	width:18px;height:18px;
+	vertical-align:middle;
+}
+.ym-controller svg path{fill:#FFF;}
 .ym-songinfo{
-	position: absolute;
-	left: 2%;
-	top:50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);	
-	width: 50%;
+	overflow:hidden;
+	float:left;
+	width: 40%;
 }
 .ym-songinfo p{
 	margin:2px;
+	white-space: nowrap;
+	word-wrap: normal;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .player-container{
-	position: absolute;
-	bottom:0px;
+	position:relative;
 	height:60px;
 	width: 100%;
+	padding:5px 2%;
+	box-sizing:border-box;
 }
 .ymbtn{
 	color:#fff;
-	margin:0 10px;
+	margin:0 8px;
 	font-size: 18px;
 	-webkit-transition:0.3s all;
 	transition:0.3s all;	
 	-moz-transition:0.3s all;		
-}
-.volume-bar{
-	width: 36%;
-	height: 4px;
-	display: inline-block;
-	background-color: #fff;
-	float:right;
-	position: absolute;
-	top: 50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);	
-	margin-left: 10px;
 	cursor: pointer;
 }
-.ym-play-status{
-	width: auto;
+/*.vol-button {
+	width: 12px;
 	display: inline-block;
-	float: left;
-	width: 59%;
-	text-align: right;
+	text-align:left;
+}*/
+.vol-button .btn-volume {
+	display:inline;
+}
+.vol-button .btn-mute {
+	display:none;
+}
+.vol-button.muted .btn-volume {
+	display:none;
+}
+.vol-button.muted .btn-mute {
+	display:inline;
+}
+.volume-bar{
+	display:inline-block;
+	width: 30%;
+	height: 50px;
+	cursor: pointer;
+	position:relative;
+	vertical-align: middle;
+}
+.volume-bar-inner{
+	position:absolute; left:0; right:5px; top:22px;
+	height: 4px;
+	background-color: #fff;
+}
+.volume-current{
+	width: 100%;
+	background-color: rgb(129,224,242);
+	height: 100%;
+	transition: 0.3s all;
+	-webkit-transition:0.3s all;
+	-moz-transition:0.3s all;
+	position:relative;
 }
 .ym-cover-image{
 	display: inline-block;
@@ -102,60 +147,45 @@ ymplayer loading{
 	margin-right: 10px;
 	background-size: cover;
 	background-position: center;
-	background-color: #fff;
 }
 .ym-progress{
 	height: 60px;
-	width: 100%;
-	position: absolute;
-	bottom: 60px;
-}
-.ym-progress-handler{
+	margin: 0 2%;
 	position: relative;
-	height: 100%;
-	width: 100%;
+}
+
+.ym-pgbar-outer{
+	position:absolute; top:0; left:60px; bottom:0; right:60px;
+	cursor:pointer;
 }
 .ym-pgbar{
 	display: inline-block;
-	width: 75%;
 	height: 4px;
 	background-color: rgb(117,222,243);
 	position: absolute;
 	top: 50%;
 	transform: translate3D(0,-50%,0);
 	-webkit-transform: translate3D(0,-50%,0);
-	left: 13%;
+	left: 0;
 	cursor: pointer;
-	right: 13%;
+	right: 0;
 }
-/*
-.duration-time{
-	position: absolute;
-	display: block;
-	right: 9%;
-	top: 50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);			
-}
-*/
+
 .current-time{
-	display: inline-block;
-	width: 5%;
+	display: block;
 	position: absolute;
-	top: 50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);
-	left: 4%;
-	right: 1%;
-	width: 10%;
+	left: 0;
+	top: 0;
+	line-height: 60px;
+	text-align: center;
 }
 .duration-time{
-	display: inline-block;
+	display: block;
 	position: absolute;
-	right: 4%;
-	top: 50%;
-	transform: translate3D(0,-50%,0);
-	-webkit-transform: translate3D(0,-50%,0);
+	right: 0;
+	top: 0;
+	line-height: 60px;
+	text-align: center;
 }
 .ym-played{
 	position: relative;
@@ -170,8 +200,9 @@ ymplayer loading{
 	width: 6px;
 	height: 6px;
 	position: absolute;
-	right: -8px;
-	top: -3px;
+	right: 0;
+	top: 50%;
+	margin: -5px;
 	border-radius: 50%;
 	background-color: rgb(206,255,255);
 	border:2px solid #fff;
@@ -187,14 +218,10 @@ ymplayer loading{
 .ym-circle:hover{
 	width:12px;
 	height:12px;
-	top:-6px;
-	right:-12px;
-}
-.looping{
-	color: rgb(83,209,223)!important;
+	margin:-8px;
 }
 .lrc-container{
-	min-height: 100%;
+	position:absolute;left:0;right:0;top:0;
 	text-align: center;
 	transition: 1s all ease-out;
 	-webkit-transition: 1s all ease-out;
@@ -207,10 +234,13 @@ ymplayer loading{
 	width: 100%;
 	height: 0px;
 	overflow-x: hidden;
+	overflow-y: hidden;
+}
+.ym-playlist.ym-show{
+	height: 400px;
 	overflow-y: auto;
 }
 .ym-playlist > single{
-	width: 100%;
 	font-size: 16px;
 	padding: 10px 3%;
 	display: block;
@@ -218,6 +248,7 @@ ymplayer loading{
 	-webkit-transition: 0.3s all ease;
 	-moz-transition: 0.3s all ease;
 	position: relative;
+	cursor:pointer;
 }
 .ym-playlist > single > .list-number{
 	color: #dedede;
@@ -246,93 +277,94 @@ single:hover{
 	color: rgb(209,253,253);
 	position: relative;
 }
-.lrc-container p{
-	margin:15px 0px;
-	font-weight: 100;
+.ym-lrcbox.ym-show{
+	height:290px;
+}
+.lrc-container lyric{
+	display:block;
+	font-weight: normal;
 	font-size: 18px;
 	line-height: 2;
+	vertical-align: middle;
+	padding:0;
+	margin:0;
 }
-.ym-active{
+.lrc-container lyric.ym-active{
 	color: #fff;
 	transition: 0.3s all;
 	-webkit-transition: 0.3s all;
 	-moz-transition: 0.3s all;	
+	font-weight:bold;
+	margin:0;
+	padding:0;
 }
-.ym-active p{
-	font-weight: bold!important;
+lyric p {
+	padding:10px 0;
+	margin:0;
 }
-.volume-current{
+.no-lrc{
+	display: table;
 	width: 100%;
-	background-color: rgb(129,224,242);
-	height: 100%;
-	transition: 0.3s all;
-	-webkit-transition:0.3s all;
-	-moz-transition:0.3s all;
-	position:relative;
-}
-.lyrictag-no-lrc{
-	line-height: 290px;
 	height: 100%;
 }
-.lyrictag-no-lrc p {
-	line-height: 290px;
+.no-lrc p {
+	display: table-cell;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+	font-size: 18px;
 }
-.lrc-fixer{
+.lrc-fixer {
 	background-color: rgba(51, 51, 51, 0.08);
 	opacity: 0;
 	position: absolute;
 	left: 0%;
 	top: 50%;
-	padding: 0% 1% 0% 1%;
 	transition: 0.75s all;
 	-webkit-transition: 0.75s all;
 	-moz-transition: 0.75s all;
 	transform: translate3D(0,-50%,0);
 	-webkit-transform: translate3D(0,-50%,0);
 }
-.ym-fix-btn{
-	display: block;
-	font-size: 24px;
-	margin:5px 0px 5px 0px;
+.ym-fix-btn{display:block;cursor:pointer;width:28px;line-height:38px;vertical-align:middle;text-align:center;}
+.ym-fix-btn svg{display:inline-block;width:24px;height:24px;vertical-align:middle;text-align:center;}
+.ym-fix-btn svg path{fill:#FFF;}
+
+.ym-progress, .ym-controller{
+	user-select:none;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+	-ms-user-select:none;
+	-o-user-select:none;
 }
-@media screen and (max-width: 864px){
-	.ym-songinfo{
-		width:35%;
-	}
-	.ym-play-status{
-		width:60%;
-	}
-	.ym-pgbar{
-		width:75%;
-	}
+
+/* Responsive Design */
+ymplayer.max-width-644 .ym-songinfo{
+	display: none;
 }
-@media screen and (max-width: 800px){
-	.ym-songinfo{
-		display: none;
-	}
-	.ym-controller{
-		width: 100%;
-	}
+ymplayer.max-width-644 .ym-controller{
+	width: 100%;
+	text-align:center;
+	float:none;
 }
-@media screen and (max-width: 700px){
-	.current-time,.duration-time{
-		display: none;
-	}
-	.ym-pgbar{
-		width: 94%;
-		left: 3%;
-		right: 3%;
-	}
+ymplayer.max-width-560 .current-time,
+ymplayer.max-width-560 .duration-time{
+	display: none;
 }
-@media screen and (max-width: 480px){
-	.volume-bar{
-		display: none;
-	}
-	.ym-play-status{
-		text-align: center;
-		width: 100%;
-	}
+ymplayer.max-width-560 .ym-pgbar-outer{
+	left: 0;
+	right: 0;
 }
+ymplayer.max-width-400 .volume-bar{
+	display: none;
+}
+ymplayer.max-width-400 .ym-controller{
+	text-align: center;
+	width: 100%;
+}
+
 /** Other Color */
 
 /* nico : Pink */

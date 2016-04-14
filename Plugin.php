@@ -9,7 +9,7 @@ if (!defined('__TYPECHO_ROOT_DIR__'))
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.4
+ * @version 0.5
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
@@ -49,11 +49,6 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-        $element = new Typecho_Widget_Helper_Form_Element_Radio(
-            'font_awesome', array(
-                'no' => '不引入',
-                'yes' => '引入'), 'no', '是否引入font-awesome', '如果你使用的主题已经引入，请选否。');
-        $form->addInput($element);
         $element = new Typecho_Widget_Helper_Form_Element_Radio(
             'force', array(
                 'no' => '不启用',
@@ -127,13 +122,8 @@ var ymplayer_download = function() {
 
     public static function insertStyle()
     {
-        $font_awesome = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->font_awesome;
         $force = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->force;
         $custom = Typecho_Widget::widget('Widget_Options')->Plugin('ymplayer')->custom;
-        if ($font_awesome == 'yes')
-        {
-            echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/font-awesome.css\" rel=\"stylesheet\">\n";
-        }
         if ($force == 'yes')
         {
             echo "<link href=\"" . Helper::options()->pluginUrl . "/ymplayer/force.css\" rel=\"stylesheet\">\n";
@@ -152,7 +142,7 @@ var ymplayer_params = " . json_encode(array(
             'url' => rtrim(Helper::options()->index, '/') . '/ymplayer.json',
         )) . ";
 </script>";
-        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.min.js\"></script>";
+        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/dist/ymplayer.js\"></script>";
         echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/init.js\"></script>";
     }
 
