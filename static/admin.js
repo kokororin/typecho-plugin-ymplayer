@@ -14,8 +14,9 @@ $(document).ready(function() {
     var d = {},
       e = [];
     $('#ymplayer-dialog-form input[type="text"]').each(function(index, elem) {
-      var $elem = $(elem);
-      d[$elem.attr('data-name')] = $elem.val();
+      var $elem = $(elem),
+          attr = $elem.attr('data-name');
+      d[attr] = $elem.val().replace(/(http.?):\/\//g, '[$1]:\/\/');
     });
     e.push(d);
     grin('[YMPlayerのPlaceholder]' + Base64.encode(JSON.stringify(e)) + '[/YMPlayerのPlaceholder]');

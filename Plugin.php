@@ -19,7 +19,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 {
 
     const PLUGIN_VERSION = '0.6';
-    const PLAYER_VERSION = '4.0.5';
+    const PLAYER_VERSION = '4.0.6';
 
     public static function activate()
     {
