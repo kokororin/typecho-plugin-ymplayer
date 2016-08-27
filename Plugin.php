@@ -60,7 +60,6 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
     public static function insertScript()
     {
         echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/static/ymplayer.js?v=" . self::PLAYER_VERSION . "\"></script>";
-        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/static/base64.js?v=" . self::PLUGIN_VERSION . "\"></script>";
         echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/static/plugin.js?v=" . self::PLUGIN_VERSION . "\"></script>";
     }
 
@@ -70,7 +69,7 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
         $text = empty($lastResult) ? $text : $lastResult;
 
         if ($widget instanceof Widget_Abstract_Contents) {
-            $text = preg_replace_callback('/\[(YMPlayerのPlaceholder)](.*?)\[\/\\1]/si', function ($matches) {
+            $text = preg_replace_callback('/\{(YMPlayerのPlaceholder)}(.*?)\{\/\\1}/si', function ($matches) {
                 $data = $matches[2];
                 $html = '<div id="ymplayer-placeholder" data-opt="' . htmlspecialchars($data) . '"></div>';
                 return $html;
@@ -102,7 +101,6 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
           </form>
         </div>
         <style>#wmd-music-button span{background:url(<?php echo file_get_contents(__DIR__ . '/static/icon.base64'); ?>);font-size:large;text-align:center;color: #999999;font-family:serif;}</style>
-        <script type="text/javascript" src="<?php echo Helper::options()->pluginUrl . '/ymplayer/static/base64.js'; ?>"></script>
         <script type="text/javascript" src="<?php echo Helper::options()->pluginUrl . '/ymplayer/static/admin.js'; ?>"></script>
 
 <?php

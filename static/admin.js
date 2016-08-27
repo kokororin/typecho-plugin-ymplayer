@@ -15,11 +15,11 @@ $(document).ready(function() {
       e = [];
     $('#ymplayer-dialog-form input[type="text"]').each(function(index, elem) {
       var $elem = $(elem),
-          attr = $elem.attr('data-name');
+        attr = $elem.attr('data-name');
       d[attr] = $elem.val().replace(/(http.?):\/\//g, '[$1]:\/\/');
     });
     e.push(d);
-    grin('[YMPlayerのPlaceholder]' + Base64.encode(JSON.stringify(e)) + '[/YMPlayerのPlaceholder]');
+    grin('{YMPlayerのPlaceholder}' + JSON.stringify(e) + '{/YMPlayerのPlaceholder}');
     hideDialog();
   });
 
