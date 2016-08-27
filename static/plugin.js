@@ -3,8 +3,9 @@ if (typeof YMPlayer != 'undefined') {
     var dom = document.getElementById('ymplayer-placeholder');
     if (dom) {
       var opt = dom.getAttribute('data-opt');
+      opt = opt.replace(/&quot;/g, '"').replace(/\[(http.?)\]/g, '$1');
+
       try {
-        opt = Base64.decode(opt);
         opt = JSON.parse(opt);
       } catch ( e ) {
         throw new Error('YMPlayer Plugin initialized failed !');
