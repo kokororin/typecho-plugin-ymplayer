@@ -4,11 +4,11 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
 }
 
 /**
- * Easy to generate YMPlayer in your article
+ * Easy to insert YMPlayer into your article
  *
  * @package ymplayer
  * @author kokororin
- * @version 0.6
+ * @version 0.7
  * @link https://kotori.love/
  * @fe kirainmoe
  * @fe-github https://github.com/kirainmoe/ymplayer
@@ -18,8 +18,7 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
 class ymplayer_Plugin implements Typecho_Plugin_Interface
 {
 
-    const PLUGIN_VERSION = '0.6';
-    const PLAYER_VERSION = '4.0.6';
+    const PLUGIN_VERSION = '0.7';
 
     public static function activate()
     {
@@ -59,17 +58,16 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 
     public static function insertScript()
     {
-        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/static/ymplayer.js?v=" . self::PLAYER_VERSION . "\"></script>";
+        echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/submodules/ymplayer/dist/assets/ymplayer.js?v=" . self::getPlayerVer() . "\"></script>";
         echo "\n<script src=\"" . Helper::options()->pluginUrl . "/ymplayer/static/plugin.js?v=" . self::PLUGIN_VERSION . "\"></script>";
     }
-
 
     public static function parse($text, $widget, $lastResult)
     {
         $text = empty($lastResult) ? $text : $lastResult;
 
         if ($widget instanceof Widget_Abstract_Contents) {
-            $text = preg_replace_callback('/\{(YMPlayerのPlaceholder)}(.*?)\{\/\\1}/si', function ($matches) {
+            $text = preg_replace_callback('/{(YMPlayer)}(.*?){\/YMPlayer}/i', function ($matches) {
                 $data = $matches[2];
                 $html = '<div id="ymplayer-placeholder" data-opt="' . htmlspecialchars($data) . '"></div>';
                 return $html;
@@ -86,14 +84,13 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
           <div>
             <p><b>render a YMPlayer component</b></p>
             <p>Please follow the instruction on <a href="https://github.com/kirainmoe/ymplayer">https://github.com/kirainmoe/ymplayer</a></p>
-            <p>Pay attention, there are no form validation.</p>
-            <p>// TODO Multi Add </p>
+            <p>If you want to add more songs, please repeat the above steps.</p>
           </div>
           <form id="ymplayer-dialog-form">
-            <input type="text" data-name="title" placeholder="title" />
-            <input type="text" data-name="artist" placeholder="artist" />
-            <input type="text" data-name="cover" placeholder="cover" />
-            <input type="text" data-name="src" placeholder="src" />
+            <input type="text" required data-name="title" placeholder="title" />
+            <input type="text" required data-name="artist" placeholder="artist" />
+            <input type="text" required data-name="cover" placeholder="cover" />
+            <input type="text" required data-name="src" placeholder="src" />
             <input type="text" data-name="lyric" placeholder="lyric" />
             <input type="text" data-name="translation" placeholder="translation" />
             <button data-action="submit" type="button" class="btn btn-s primary">确定</button>
@@ -105,5 +102,12 @@ class ymplayer_Plugin implements Typecho_Plugin_Interface
 
 <?php
 }
+
+    private static function getPlayerVer()
+    {
+        $package = file_get_contents(__DIR__ . '/submodules/ymplayer/package.json');
+        $package = json_decode($package);
+        return $package->version;
+    }
 
 }

@@ -11,15 +11,29 @@ $(document).ready(function() {
   });
 
   $('#ymplayer-dialog button[data-action="submit"]').click(function() {
-    var d = {},
-      e = [];
-    $('#ymplayer-dialog-form input[type="text"]').each(function(index, elem) {
+    var value = {},
+      opt = [],
+      textarea = $('#text');
+    if (!document.getElementById('ymplayer-dialog-form').checkValidity()) {
+      alert('Some fields are empty.');
+      return false;
+    }
+    $('#ymplayer-dialog-form input[data-name]').each(function(index, elem) {
       var $elem = $(elem),
         attr = $elem.attr('data-name');
-      d[attr] = $elem.val().replace(/(http.?):\/\//g, '[$1]:\/\/');
+      value[attr] = $elem.val().replace(/(http.?):\/\//g, '[$1]:\/\/');
     });
-    e.push(d);
-    grin('{YMPlayerのPlaceholder}' + JSON.stringify(e) + '{/YMPlayerのPlaceholder}');
+    var matches = textarea.val().match(/{(YMPlayer)}(.*?){\/YMPlayer}/i);
+    if (matches && matches[2]) {
+      opt = matches[2];
+      opt = JSON.parse(opt);
+      opt.push(value);
+      textarea.val(textarea.val().replace(matches[2], JSON.stringify(opt)));
+    } else {
+      opt.push(value);
+      grin('{YMPlayer}' + JSON.stringify(opt) + '{/YMPlayer}');
+    }
+
     hideDialog();
   });
 

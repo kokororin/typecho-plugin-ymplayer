@@ -1,0 +1,3 @@
+[submodule "submodules/ymplayer"]
+	path = submodules/ymplayer
+	url = https://github.com/kirainmoe/ymplayer
