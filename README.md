@@ -30,6 +30,11 @@ $ chown -R www:www *
 
 在文章编辑页面中，在要插入播放器的部分点击工具栏按钮。
 
+### 更新ymplayer
+```bash
+$ git submodule update
+```
+
 
 ## LICENSE
 

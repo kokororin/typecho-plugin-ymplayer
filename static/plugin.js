@@ -1,5 +1,5 @@
 if (typeof YMPlayer != 'undefined') {
-  (function() {
+  (function(player) {
     var dom = document.getElementById('ymplayer-placeholder');
     if (dom) {
       var opt = dom.getAttribute('data-opt');
@@ -10,7 +10,7 @@ if (typeof YMPlayer != 'undefined') {
       } catch ( e ) {
         throw new Error('YMPlayer Plugin initialized failed !');
       }
-      YMPlayer.render(opt, dom);
+      player.render(opt, dom);
     }
   })(YMPlayer);
 }
