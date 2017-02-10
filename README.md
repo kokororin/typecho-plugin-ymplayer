@@ -17,6 +17,7 @@ A typecho plugin for YMPlayer https://github.com/kirainmoe/ymplayer
 - 登录后台激活插件，会提示安装 submodule ，如果服务器可写，插件会自动安装。
 - 如果服务器不可写或安装失败，请前往 https://github.com/kirainmoe/ymplayer 下载项目 ZIP，并解压到 **/usr/plugin/ymplayer/submodule/ymplayer** 下。
 - 完成后请确保 **http://yourdomain/usr/plugin/ymplayer/submodule/ymplayer/dist/assets/ymplayer.js** 可以通过浏览器正常访问，即表示安装完成。
+
 ### 使用git安装
 ```bash
 #安装插件
